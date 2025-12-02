@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CLZPRE_kurzusfelvetel tanév="2025/2026 I." egyetem="ME">
+<!DOCTYPE CLZPRE_kurzusfelvetel SYSTEM "CLZPRE_kurzusfelvetel.dtd">
+    
+    <hallgato>
+        <hnev>CLZPRE Hallgató</hnev>
+        <szulev>2000</szulev>
+        <szak evf="3">BIFW</szak>
+    </hallgato>
+    
+    <kurzusok>
+        
+        <kurzus id="CLZPRE1" jovahagyas="igen" nyelv="magyar">
+            <kurzusnev>Web technológiák 1</kurzusnev>
+            <kredit>5</kredit>
+            <hely>V A1 magasfsz3-4</hely>
+            <idopont>Hétfő 10:00-12:00</idopont>
+            <idopont>Hétfő 14:00-16:00</idopont>
+            <oktato>Agárdi Anita</oktato>
+            <oraado>Minta Ors</oraado>
+        </kurzus>
+        
+        <kurzus id="CLZPRE2" jovahagyas="nem" nyelv="angol">
+            <kurzusnev>Mesterséges intelligencia</kurzusnev>
+            <kredit>4</kredit>
+            <hely>XXXII A1 magasfsz</hely>
+            <idopont>Kedd 10:00-14:00</idopont>
+            <oktato>Kunnné Dr. Tamás Judit</oktato>
+            <oraado>Példa Ádám</oraado>
+        </kurzus>
+        
+        <kurzus id="CLZPRE3">
+            <kurzusnev>Windows rendsz. és kezelés</kurzusnev>
+            <kredit>3</kredit>
+            <hely>In/103 I. m. 103</hely>
+            <idopont>Kedd 08:00-10:00</idopont>
+            <idopont>Kedd 16:00-18:00</idopont>
+            <oktato>Dr. Wágner György</oktato>
+        </kurzus>
+        
+        <kurzus id="CLZPRE4">
+            <kurzusnev>Webes adatkezelő környezetek</kurzusnev>
+            <kredit>5</kredit>
+            <hely>In/101 I. e. 101</hely>
+            <idopont>Szerda 10:00-12:00</idopont>
+            <oktato>Dr. Bednarik László</oktato>
+        </kurzus>
+        
+    </kurzusok>
+    
+</CLZPRE_kurzusfelvetel>

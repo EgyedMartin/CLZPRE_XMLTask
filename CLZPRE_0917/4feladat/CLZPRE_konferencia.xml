@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<konferencia>
+    
+    <cím>
+        <hallgatók>
+            <hallgató>
+                <név>Kiss Gábor</név>
+                <lakcím>Miskolc, Egyetemváros</lakcím>
+            </hallgató>
+            <hallgató>
+                <név>Nagy Anna</név>
+                <lakcím>Budapest, Béke u. 10.</lakcím>
+            </hallgató>
+        </hallgatók>
+    </cím>
+    
+    <helyszín>Bolyai Épület, A-5 előadó</helyszín>
+    
+    <előadó>
+        <név>Dr. Szabó Viktor</név>
+        <lakcím>Debrecen, Fő út 1.</lakcím>
+        <adószám>12345678-1-12</adószám>
+    </előadó>
+    
+    <előadó>
+        <név>Kovács Eszter</név>
+        <lakcím>Szeged, Rákóczi u. 20.</lakcím>
+        <adószám>87654321-2-21</adószám>
+    </előadó>
+    
+    <dátum>2025-11-20</dátum>
+    
+</konferencia>

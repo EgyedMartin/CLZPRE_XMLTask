@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified">
+
+    <xs:simpleType name="NapTipus">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Hétfő"/>
+            <xs:enumeration value="Kedd"/>
+            <xs:enumeration value="Szerda"/>
+            <xs:enumeration value="Csütörtök"/>
+            <xs:enumeration value="Péntek"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="IdoTipus">
+        <xs:restriction base="xs:time"/>
+    </xs:simpleType>
+
+    <xs:simpleType name="TipusTipus">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Előadás"/>
+            <xs:enumeration value="Gyakorlat"/>
+            <xs:enumeration value="Gyak. íd.nyelvi okt.k"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="IdopontTipus">
+        <xs:sequence>
+            <xs:element name="nap" type="NapTipus"/>
+            <xs:element name="tol" type="IdoTipus"/>
+            <xs:element name="ig" type="IdoTipus"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="OraTipus">
+        <xs:sequence>
+            <xs:element name="targy" type="xs:string"/>
+            <xs:element name="idopont" type="IdopontTipus"/>
+            <xs:element name="helyszin" type="xs:string"/>
+            <xs:element name="oktato" type="xs:string"/>
+            <xs:element name="szak" type="xs:string"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:ID" use="required"/>
+        <xs:attribute name="tipus" type="TipusTipus" use="required"/>
+    </xs:complexType>
+
+    <xs:element name="CLZPRE_orarend">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="ora" type="OraTipus" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+        <xs:key name="OraIDKulcs">
+            <xs:selector xpath="ora"/>
+            <xs:field xpath="@id"/>
+        </xs:key>
+    </xs:element>
+
+</xs:schema>

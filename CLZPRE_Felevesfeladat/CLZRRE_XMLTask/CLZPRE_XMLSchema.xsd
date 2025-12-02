@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+    <xs:element name="EgyetemiRendszer">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="oktato" type="OktatoTipus" maxOccurs="unbounded"/>
+                <xs:element name="tanszek" type="TanszekTipus" maxOccurs="unbounded"/>
+                <xs:element name="kurzus" type="KurzusTipus" maxOccurs="unbounded"/>
+                <xs:element name="kovetelmeny" type="KovetelmenyTipus" maxOccurs="unbounded"/>
+                <xs:element name="hallgato" type="HallgatoTipus" maxOccurs="unbounded"/>
+                <xs:element name="jelentkezes" type="JelentkezesTipus" maxOccurs="unbounded"/>
+                <xs:element name="vizsga" type="VizsgaTipus" maxOccurs="unbounded"/>
+                <xs:element name="jegy" type="JegyTipus" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+
+        <xs:key name="oktatoKey">
+            <xs:selector xpath="oktato"/>
+            <xs:field xpath="@oId"/>
+        </xs:key>
+
+        <xs:key name="tanszekKey">
+            <xs:selector xpath="tanszek"/>
+            <xs:field xpath="@tId"/>
+        </xs:key>
+
+        <xs:key name="kurzusKey">
+            <xs:selector xpath="kurzus"/>
+            <xs:field xpath="@kId"/>
+        </xs:key>
+
+        <xs:key name="kovetelmenyKey">
+            <xs:selector xpath="kovetelmeny"/>
+            <xs:field xpath="@kvId"/>
+        </xs:key>
+
+        <xs:key name="hallgatoKey">
+            <xs:selector xpath="hallgato"/>
+            <xs:field xpath="@hId"/>
+        </xs:key>
+
+        <xs:keyref name="kurzus_to_tanszek" refer="tanszekKey">
+            <xs:selector xpath="kurzus"/>
+            <xs:field xpath="@tanszekId"/>
+        </xs:keyref>
+
+        <xs:keyref name="kurzus_to_oktato" refer="oktatoKey">
+            <xs:selector xpath="kurzus"/>
+            <xs:field xpath="@oktatoId"/>
+        </xs:keyref>
+
+        <xs:keyref name="jelentkezes_to_oktato" refer="oktatoKey">
+            <xs:selector xpath="jelentkezes"/>
+            <xs:field xpath="@oId"/>
+        </xs:keyref>
+
+        <xs:keyref name="jelentkezes_to_kurzus" refer="kurzusKey">
+            <xs:selector xpath="jelentkezes"/>
+            <xs:field xpath="@kId"/>
+        </xs:keyref>
+
+        <xs:keyref name="jegy_to_hallgato" refer="hallgatoKey">
+            <xs:selector xpath="jegy"/>
+            <xs:field xpath="@hId"/>
+        </xs:keyref>
+
+        <xs:keyref name="jegy_to_kurzus" refer="kurzusKey">
+            <xs:selector xpath="jegy"/>
+            <xs:field xpath="@kId"/>
+        </xs:keyref>
+
+        <xs:keyref name="vizsga_to_kurzus" refer="kurzusKey">
+            <xs:selector xpath="vizsga"/>
+            <xs:field xpath="@kId"/>
+        </xs:keyref>
+
+    </xs:element>
+
+    <xs:complexType name="OktatoTipus">
+        <xs:sequence>
+            <xs:element name="nev" type="xs:string"/>
+            <xs:element name="szekhely" type="xs:string"/>
+            <xs:element name="telefonszam" type="xs:string"/>
+        </xs:sequence>
+        <xs:attribute name="oId" type="xs:integer" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="TanszekTipus">
+        <xs:sequence>
+            <xs:element name="nev" type="xs:string"/>
+            <xs:element name="alapitva" type="xs:integer"/>
+            <xs:element name="cim">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="varos" type="xs:string"/>
+                        <xs:element name="utca" type="xs:string"/>
+                        <xs:element name="hazszam" type="xs:integer"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="tId" type="xs:integer" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="KurzusTipus">
+        <xs:sequence>
+            <xs:element name="nev" type="xs:string"/>
+            <xs:element name="kredit" type="xs:integer"/>
+            <xs:element name="leiras" type="xs:string"/>
+        </xs:sequence>
+        <xs:attribute name="kId" type="xs:integer" use="required"/>
+        <xs:attribute name="tanszekId" type="xs:integer" use="required"/>
+        <xs:attribute name="oktatoId" type="xs:integer" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="KovetelmenyTipus">
+        <xs:sequence>
+            <xs:element name="tipus" type="xs:string"/>
+            <xs:element name="vizsga_ido" type="xs:date"/>
+            <xs:element name="min_pont" type="xs:integer"/>
+            <xs:element name="max_pont" type="xs:integer"/>
+        </xs:sequence>
+        <xs:attribute name="kvId" type="xs:integer" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="HallgatoTipus">
+        <xs:sequence>
+            <xs:element name="nev" type="xs:string"/>
+            <xs:element name="email" type="xs:string"/>
+            <xs:element name="neptun" type="xs:string"/>
+            <xs:element name="profilkep" type="xs:string"/>
+        </xs:sequence>
+        <xs:attribute name="hId" type="xs:integer" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="JelentkezesTipus">
+        <xs:sequence>
+            <xs:element name="datum" type="xs:date"/>
+            <xs:element name="megjegyzes" type="xs:string"/>
+        </xs:sequence>
+        <xs:attribute name="oId" type="xs:integer" use="required"/>
+        <xs:attribute name="kId" type="xs:integer" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="VizsgaTipus">
+        <xs:sequence>
+            <xs:element name="vizsgazo" type="xs:string"/>
+            <xs:element name="datum" type="xs:date"/>
+        </xs:sequence>
+        <xs:attribute name="kId" type="xs:integer" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="JegyTipus">
+        <xs:sequence>
+            <xs:element name="pontszam" type="xs:integer"/>
+            <xs:element name="datum" type="xs:date"/>
+            <xs:element name="ertekeles_szoveg" type="xs:string"/>
+        </xs:sequence>
+        <xs:attribute name="hId" type="xs:integer" use="required"/>
+        <xs:attribute name="kId" type="xs:integer" use="required"/>
+    </xs:complexType>
+
+</xs:schema>

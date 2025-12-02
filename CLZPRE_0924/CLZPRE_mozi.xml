@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mozi SYSTEM "CLZPRE_mozi.dtd">
+<mozi>
+    <film id="f101" cim="Mátrix" mufaj="Sci-fi">
+        <rendezo>Wachowski Fivérek</rendezo>
+        <kategoria>Sci-fi</kategoria>
+        <hossz>136 perc</hossz>
+        <bemutato/>
+        <szinesz nev="Keanu Reeves" id="k7r_a3s_2j">
+            <szerep>Neo</szerep>
+            <gyerekszinesz/>
+        </szinesz>
+    </film>
+    
+    </mozi>

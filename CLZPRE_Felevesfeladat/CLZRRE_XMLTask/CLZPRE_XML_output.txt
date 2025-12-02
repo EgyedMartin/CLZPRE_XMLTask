@@ -1,0 +1,147 @@
+Gyökér elem: EgyetemiRendszer
+--------------------------------
+
+Elem: Oktató
+--------------------------------
+Oktató azonosító: 1
+Név: Dr. Kovács András
+Székhely/Iroda: A/1.01
+Telefonszám: 06-46-111-222
+--------------------------------
+
+Elem: Oktató
+--------------------------------
+Oktató azonosító: 2
+Név: Prof. Tóth Éva
+Székhely/Iroda: B/2.05
+Telefonszám: 06-46-333-444
+--------------------------------
+
+Elem: Tanszék
+--------------------------------
+Tanszék azonosító: 1
+Név: Informatikai Rendszerek Tanszéke
+Alapítva: 1998
+Cím:
+    Város: Miskolc
+    Utca: Egyetem út
+    Házszám: 1
+--------------------------------
+
+Elem: Tanszék
+--------------------------------
+Tanszék azonosító: 2
+Név: Gazdaságtudományi Tanszék
+Alapítva: 2005
+Cím:
+    Város: Miskolc
+    Utca: Fő utca
+    Házszám: 42
+--------------------------------
+
+Elem: Kurzus
+--------------------------------
+Kurzus azonosító: 1
+Tanszék azonosító (FK): 1
+Oktató azonosító (FK): 1
+Név: XML Adatbázisok
+Kredit érték: 4
+Leírás: XML dokumentumok tárolása, kezelése és feldolgozása.
+--------------------------------
+
+Elem: Kurzus
+--------------------------------
+Kurzus azonosító: 2
+Tanszék azonosító (FK): 1
+Oktató azonosító (FK): 2
+Név: Adatbázisrendszerek I.
+Kredit érték: 5
+Leírás: Relációs adatbázisok alapjai.
+--------------------------------
+
+Elem: Kurzus
+--------------------------------
+Kurzus azonosító: 3
+Tanszék azonosító (FK): 2
+Oktató azonosító (FK): 2
+Név: Vállalati Pénzügyek
+Kredit érték: 3
+Leírás: Pénzügyi döntések a vállalatok életében.
+--------------------------------
+
+Elem: Követelmény
+--------------------------------
+Követelmény azonosító: 1
+Típus: előadás
+Vizsga időpont: 2026-06-15
+Minimális pontszám: 40
+Maximális pontszám: 100
+--------------------------------
+
+Elem: Követelmény
+--------------------------------
+Követelmény azonosító: 2
+Típus: labor
+Vizsga időpont: 2026-05-20
+Minimális pontszám: 30
+Maximális pontszám: 100
+--------------------------------
+
+Elem: Hallgató
+--------------------------------
+Hallgató azonosító: 1
+Név: Horváth Bálint
+E-mail cím: balint.horvath@stud.uni.hu
+Neptun kód: CLZPRE
+Profilkép: balint.jpg
+--------------------------------
+
+Elem: Hallgató
+--------------------------------
+Hallgató azonosító: 2
+Név: Szabó Petra
+E-mail cím: petra.szabo@stud.uni.hu
+Neptun kód: QWERTY
+Profilkép: petra.png
+--------------------------------
+
+Elem: Jelentkezés (Oktató)
+--------------------------------
+Oktató azonosító: 1
+Kurzus azonosító: 1
+Dátum: 2026-01-20
+Megjegyzés: Kurzus felelős oktató
+--------------------------------
+
+Elem: Jelentkezés (Oktató)
+--------------------------------
+Oktató azonosító: 2
+Kurzus azonosító: 2
+Dátum: 2026-01-22
+Megjegyzés: Előadó
+--------------------------------
+
+Elem: Vizsga
+--------------------------------
+Kurzus azonosító: 1
+Vizsgázó: Horváth Bálint
+Dátum: 2026-06-15
+--------------------------------
+
+Elem: Jegy (Hallgató)
+--------------------------------
+Hallgató azonosító: 1
+Kurzus azonosító: 1
+Pontszám: 85
+Dátum: 2026-06-15
+Értékelés szövege: Jól teljesített a vizsgán.
+--------------------------------
+
+Elem: Jegy (Hallgató)
+--------------------------------
+Hallgató azonosító: 2
+Kurzus azonosító: 2
+Pontszám: 60
+Dátum: 2026-05-20
+Értékelés szövege: Elfogadható eredmény.
+--------------------------------

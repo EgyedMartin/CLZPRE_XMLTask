@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <title>Kezdőlap - Kurzusok</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<style>
+    body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 10px 0;
+        }
+        nav {
+            margin: 20px 0;
+            background-color: #444;
+            padding: 10px;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        nav a:hover {
+            color: #ff9900;
+        }
+        main {
+            width: 80%;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        footer {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            font-size: 14px;
+        }
+        .logo {
+            max-width: 150px;
+            border: 2px solid white;
+        }
+        .content-img {
+            max-width: 400px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+</style>
+<body>
+
+    <header>
+        <a href="index.html">
+            <img src="iit.jpg" alt="IIT Logó - Vissza a kezdőlapra" class="logo">
+        </a>
+        <h1>Tanult Kurzusok Portál</h1>
+    </header>
+
+    <nav>
+        <a href="database.html">Adatbázis rendszerek</a> |
+        <a href="webtech.html">Web technológiák 1</a> |
+        <a href="webxml.html">Webes adatkezelő környezetek</a>
+    </nav>
+
+    <main>
+        <h2>Üdvözöllek a kurzus bemutató oldalon!</h2>
+        <p>Válassz a fenti menüpontok közül a tantárgyak tematikájának megtekintéséhez.</p>
+        
+        <h3>Bemutatkozó videó</h3>
+        <video width="480" height="320" controls>
+            <source src="XMLvideo.mp4" type="video/mp4">
+            A böngésződ nem támogatja a videó lejátszását.
+        </video>
+    </main>
+
+    <footer>
+        Egyed Martin | CLZPRE | 2025
+    </footer>
+
+</body>
+</html>

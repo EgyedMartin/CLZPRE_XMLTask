@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<EgyetemiRendszer xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="CLZPRE_XMLSchema.xsd">
+
+    <oktato oId="1">
+        <nev>Dr. Kovács András</nev>
+        <szekhely>A/1.01</szekhely>
+        <telefonszam>06-46-111-222</telefonszam>
+    </oktato>
+
+    <oktato oId="2">
+        <nev>Prof. Tóth Éva</nev>
+        <szekhely>B/2.05</szekhely>
+        <telefonszam>06-46-333-444</telefonszam>
+    </oktato>
+
+    <tanszek tId="1">
+        <nev>Informatikai Rendszerek Tanszéke</nev>
+        <alapitva>1998</alapitva>
+        <cim>
+            <varos>Miskolc</varos>
+            <utca>Egyetem út</utca>
+            <hazszam>1</hazszam>
+        </cim>
+    </tanszek>
+
+    <tanszek tId="2">
+        <nev>Gazdaságtudományi Tanszék</nev>
+        <alapitva>2005</alapitva>
+        <cim>
+            <varos>Miskolc</varos>
+            <utca>Fő utca</utca>
+            <hazszam>42</hazszam>
+        </cim>
+    </tanszek>
+
+    <kurzus kId="1" tanszekId="1" oktatoId="1">
+        <nev>XML Adatbázisok</nev>
+        <kredit>4</kredit>
+        <leiras>XML dokumentumok tárolása, kezelése és feldolgozása.</leiras>
+    </kurzus>
+
+    <kurzus kId="2" tanszekId="1" oktatoId="2">
+        <nev>Adatbázisrendszerek I.</nev>
+        <kredit>5</kredit>
+        <leiras>Relációs adatbázisok alapjai.</leiras>
+    </kurzus>
+
+    <kurzus kId="3" tanszekId="2" oktatoId="2">
+        <nev>Vállalati Pénzügyek</nev>
+        <kredit>3</kredit>
+        <leiras>Pénzügyi döntések a vállalatok életében.</leiras>
+    </kurzus>
+
+
+    <kovetelmeny kvId="1">
+        <tipus>előadás</tipus>
+        <vizsga_ido>2026-06-15</vizsga_ido>
+        <min_pont>40</min_pont>
+        <max_pont>100</max_pont>
+    </kovetelmeny>
+
+    <kovetelmeny kvId="2">
+        <tipus>labor</tipus>
+        <vizsga_ido>2026-05-20</vizsga_ido>
+        <min_pont>30</min_pont>
+        <max_pont>100</max_pont>
+    </kovetelmeny>
+
+
+    <hallgato hId="1">
+        <nev>Horváth Bálint</nev>
+        <email>balint.horvath@stud.uni.hu</email>
+        <neptun>CLZPRE</neptun>
+        <profilkep>balint.jpg</profilkep>
+    </hallgato>
+
+    <hallgato hId="2">
+        <nev>Szabó Petra</nev>
+        <email>petra.szabo@stud.uni.hu</email>
+        <neptun>QWERTY</neptun>
+        <profilkep>petra.png</profilkep>
+    </hallgato>
+
+
+    <jelentkezes oId="1" kId="1">
+        <datum>2026-01-20</datum>
+        <megjegyzes>Kurzus felelős oktató</megjegyzes>
+    </jelentkezes>
+
+    <jelentkezes oId="2" kId="2">
+        <datum>2026-01-22</datum>
+        <megjegyzes>Előadó</megjegyzes>
+    </jelentkezes>
+
+    <vizsga kId="1">
+        <vizsgazo>Horváth Bálint</vizsgazo>
+        <datum>2026-06-15</datum>
+    </vizsga>
+
+    <jegy hId="1" kId="1">
+        <pontszam>85</pontszam>
+        <datum>2026-06-15</datum>
+        <ertekeles_szoveg>Jól teljesített a vizsgán.</ertekeles_szoveg>
+    </jegy>
+
+    <jegy hId="2" kId="2">
+        <pontszam>60</pontszam>
+        <datum>2026-05-20</datum>
+        <ertekeles_szoveg>Elfogadható eredmény.</ertekeles_szoveg>
+    </jegy>
+
+</EgyetemiRendszer>

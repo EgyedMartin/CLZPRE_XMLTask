@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="orarend.xsl"?>
+
+<CLZPRE_orarend
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="CLZPRE_orarend.xsd">
+
+    <ora id="1" tipus="Előadás"><targy>El.technika-elektronika</targy><idopont><nap>Hétfő</nap><tol>08:00</tol><ig>09:00</ig></idopont><helyszin>BIII A4 fsz.</helyszin><oktato>Szabó Norbert</oktato><szak>G 3BIFW</szak></ora>
+    <ora id="2" tipus="Előadás"><targy>El.technika-elektronika</targy><idopont><nap>Hétfő</nap><tol>09:00</tol><ig>10:00</ig></idopont><helyszin>BIII A4 fsz.</helyszin><oktato>Szabó Norbert</oktato><szak>G 3BIFW</szak></ora>
+    <ora id="3" tipus="Előadás"><targy>Web technológiák 1</targy><idopont><nap>Hétfő</nap><tol>10:00</tol><ig>11:00</ig></idopont><helyszin>V A1 magasfsz3-4</helyszin><oktato>Agárdi Anita</oktato><szak>G 3BIFW</szak></ora>
+    <ora id="4" tipus="Előadás"><targy>Web technológiák 1</targy><idopont><nap>Hétfő</nap><tol>11:00</tol><ig>12:00</ig></idopont><helyszin>V A1 magasfsz3-4</helyszin><oktato>Agárdi Anita</oktato><szak>G 3BIFW</szak></ora>
+    <ora id="5" tipus="Gyak. íd.nyelvi okt.k"><targy>Műszaki szaknyelv 1</targy><idopont><nap>Hétfő</nap><tol>12:00</tol><ig>13:00</ig></idopont><helyszin>A1/314 A1 elm. 314</helyszin><oktato>Gyak. Vez.</oktato><szak>G 3BIFW</szak></ora>
+    <ora id="30" tipus="Előadás"><targy>Webes adatkezelő környezetek</targy><idopont><nap>Szerda</nap><tol>15:00</tol><ig>16:00</ig></idopont><helyszin>In/101 I. e. 101</helyszin><oktato>Dr. Bednarik László</oktato><szak>G 3BIFW</szak></ora>
+
+</CLZPRE_orarend>

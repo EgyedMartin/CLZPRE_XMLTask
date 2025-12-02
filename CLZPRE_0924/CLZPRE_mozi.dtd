@@ -1,0 +1,23 @@
+<!ELEMENT mozi (film*)>
+
+<!ELEMENT film (rendezo+, (kategoria | hossz | bemutato)+, szinesz+)>
+
+<!ATTLIST film
+    id ID #REQUIRED
+    cim CDATA #REQUIRED
+    mufaj (Sci-fi | Akció | Vígjáték) #REQUIRED  >
+
+<!ELEMENT rendezo (#PCDATA)>
+<!ELEMENT kategoria (#PCDATA)>
+<!ELEMENT hossz (#PCDATA)>
+<!ELEMENT bemutato EMPTY>
+
+<!ELEMENT szinesz (szerep, (gyerekszinesz | musicalsinesz | szinkronszinesz)?)>
+<!ATTLIST szinesz
+    nev CDATA #REQUIRED
+    id ID #IMPLIED
+>
+<!ELEMENT szerep (#PCDATA)>
+<!ELEMENT gyerekszinesz EMPTY>
+<!ELEMENT musicalsinesz EMPTY>
+<!ELEMENT szinkronszinesz EMPTY>

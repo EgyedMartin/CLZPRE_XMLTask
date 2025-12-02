@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mozi [
+    <!ELEMENT mozi (film*)>
+    <!ELEMENT film (rendezo+, kategoria+, hossz+, bemutato+, szinesz+)>
+    <!ATTLIST film
+        id ID #REQUIRED
+        cim CDATA #REQUIRED
+        mufaj (Sci-fi | Akció | Vígjáték) #REQUIRED
+    >
+    <!ELEMENT rendezo (#PCDATA)>
+    <!ELEMENT kategoria (#PCDATA)>
+    <!ELEMENT hossz (#PCDATA)>
+    <!ELEMENT bemutato EMPTY>
+    <!ELEMENT szinesz (szerep, gyerekszinesz?, musicalsinesz?, szinkronszinesz?)>
+    <!ATTLIST szinesz
+        nev CDATA #REQUIRED
+        id ID #IMPLIED
+    >
+    <!ELEMENT szerep (#PCDATA)>
+    <!ELEMENT gyerekszinesz EMPTY>
+    <!ELEMENT musicalsinesz EMPTY>
+    <!ELEMENT szinkronszinesz EMPTY>
+]>
+<mozi>
+    <film id="f101" cim="Mátrix" mufaj="Sci-fi">
+        <rendezo>Wachowski Fivérek</rendezo>
+        <kategoria>Sci-fi</kategoria>
+        <hossz>136 perc</hossz>
+        <bemutato/>
+        <szinesz nev="Keanu Reeves">
+            <szerep>Neo</szerep>
+            <gyerekszinesz/>
+            <musicalsinesz/>
+            <szinkronszinesz/>
+        </szinesz>
+        <szinesz nev="Laurence Fishburne">
+            <szerep>Morpheus</szerep>
+        </szinesz>
+    </film>
+    
+    <film id="f102" cim="Die Hard" mufaj="Akció">
+        <rendezo>John McTiernan</rendezo>
+        <kategoria>Akció</kategoria>
+        <hossz>132 perc</hossz>
+        <bemutato/>
+        <szinesz nev="Bruce Willis">
+            <szerep>John McClane</szerep>
+        </szinesz>
+    </film>
+</mozi>

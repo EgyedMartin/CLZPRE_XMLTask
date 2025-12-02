@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mozi>
+    
+    <film id="f101" cim="Mátrix" mufaj="Sci-fi">
+        <kategoria>Akció, Sci-fi</kategoria>
+        <hossz perc="136">2 óra 16 perc</hossz>
+        <bemutato ev="1999" honap="Március" nap="31"/>
+        
+        <rendezo orszag="USA">
+            <nev>Wachowski Fivérek</nev>
+        </rendezo>
+        
+        <szinesz id="k7r_a3s_2j" nev="Keanu Reeves">
+            <szerep>Neo</szerep>
+            <kor>35</kor> 
+            <gyerekszinesz jelleg="nem_volt" />
+            <musicalsinesz />
+            <szinkronszinesz nyelv="magyar" />
+        </szinesz>
+        
+        <szinesz id="l8f_b4t_3k" nev="Laurence Fishburne">
+            <szerep>Morpheus</szerep>
+            <kor>38</kor>
+        </szinesz>
+    </film>
+    
+    
+    <film id="f102" cim="Eredet" mufaj="Akció">
+        <kategoria>Sci-fi, Thriller</kategoria>
+        <hossz perc="148">2 óra 28 perc</hossz>
+        <bemutato ev="2010" honap="Július" nap="16"/>
+        
+        <rendezo orszag="USA">
+            <nev>Christopher Nolan</nev>
+            <szul_ev>1970</szul_ev>
+        </rendezo>
+        
+        <iro orszag="USA">
+            <nev>Christopher Nolan</nev>
+            <munka>Forgatókönyv</munka>
+        </iro>
+        
+        <szinesz id="u5g_4xm_2jb" nev="Leonardo DiCaprio">
+            <szerep>Cobb</szerep>
+        </szinesz>
+        
+        <szinesz id="k7r_b4t_3k" nev="Joseph Gordon-Levitt">
+            <szerep>Arthur</szerep>
+        </szinesz>
+        
+    </film>
+</mozi>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mozi>
+    <film id="f101" cim="Mátrix" mufaj="Sci-fi">
+        
+        <rendezo orszag="USA">
+            <nev>Wachowski Fivérek</nev>
+        </rendezo>
+        
+        <kategoria>Akció, Sci-fi</kategoria>
+        <hossz perc="136">2 óra 16 perc</hossz>
+        <bemutato ev="1999" honap="Március" nap="31"/>
+        
+        <szinesz id="k7r_a3s_2j" nev="Keanu Reeves">
+            <szerep>Neo</szerep>
+            <kor>35</kor> 
+            
+            <gyerekszinesz jelleg="nem_volt" />
+            <musicalsinesz />
+            <szinkronszinesz nyelv="magyar" />
+        </szinesz>
+        
+        <szinesz id="l8f_b4t_3k" nev="Laurence Fishburne">
+            <szerep>Morpheus</szerep>
+            <kor>38</kor>
+        </szinesz>
+        
+    </film>
+    
+    <film id="f103" cim="A Gyűrűk Ura: A Gyűrű Szövetsége" mufaj="Fantasy">
+        <rendezo orszag="Új-Zéland">
+            <nev>Peter Jackson</nev>
+        </rendezo>
+        
+        <szinesz id="e4r_t7y_u2" nev="Elijah Wood">
+            <szerep>Frodó</szerep>
+            <kor>20</kor>
+        </szinesz>
+    </film>
+    
+</mozi>
