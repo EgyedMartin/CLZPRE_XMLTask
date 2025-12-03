@@ -1,0 +1,49 @@
+package domclzpre1029;
+
+import java.io.File;
+import java.io.IOException;
+
+import javax.xml.parsers.*;
+import org.xml.sax.*;
+
+import org.w3c.dom.*;
+
+public class DomReadCLZPRE {
+    public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException {
+        File xmlFile = new File("CLZPRE_1029/DomParseCLZPRE/hallgatoCLZPRE.xml");
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = factory.newDocumentBuilder();
+
+        Document clzpre = dBuilder.parse(xmlFile);
+        clzpre.getDocumentElement().normalize();
+
+        System.out.println("Gyökér elem: " + clzpre.getDocumentElement().getNodeName());
+
+        NodeList nList = clzpre.getElementsByTagName("hallgato");
+
+        for (int i = 0; i < nList.getLength(); i++) {
+            Node nNode = nList.item(i);
+            System.out.println("\nAktuális elem: " + nNode.getNodeName());
+
+            if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                Element elem = (Element) nNode;
+
+                String hid = elem.getAttribute("id");
+
+                Node node1 = elem.getElementsByTagName("keresztnev").item(0);
+                String kname = node1.getTextContent();
+
+                Node node2 = elem.getElementsByTagName("vezeteknev").item(0);
+                String vname = node2.getTextContent();
+
+                Node node3 = elem.getElementsByTagName("foglalkozas").item(0);
+                String fname = node3.getTextContent();
+
+                System.out.println("Hallgató ID: " + hid);
+                System.out.println("Keresztnév: " + kname);
+                System.out.println("Vezetéknév: " + vname);
+                System.out.println("Foglalkozás: " + fname);
+            }
+        }
+    }
+}

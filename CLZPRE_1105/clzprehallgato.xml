@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<hallgatok>
+    <hallgato id="01">
+        <keresztnev>Martin</keresztnev>
+        <vezeteknev>Egyed</vezeteknev>
+        <kor>21</kor>
+        <szak>Informatikus</szak>
+    </hallgato>
+    <hallgato id="02">
+        <keresztnev>Anna</keresztnev>
+        <vezeteknev>Nagy</vezeteknev>
+        <kor>20</kor>
+        <szak>Gazdasági</szak>
+    </hallgato>
+</hallgatok>

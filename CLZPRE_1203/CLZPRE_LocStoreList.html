@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orarend - Lista Nézet (Local Storage)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+
+        h1 {
+            color: #007bff;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 5px;
+        }
+
+        /* Vezérlőpult stílusa */
+        #vezelopult {
+            background-color: #fff;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        button {
+            background-color: #5cb85c;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #4cae4c;
+        }
+
+        /* Lista nézet stílusa */
+        #orarendMegjelenites {
+            margin-top: 20px;
+        }
+        
+        .ora-kartya {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .ora-kartya h3 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 1px dashed #eee;
+            padding-bottom: 5px;
+        }
+
+        .ora-kartya dl {
+            margin: 0;
+        }
+
+        .ora-kartya dt {
+            font-weight: bold;
+            margin-top: 5px;
+            color: #555;
+            float: left;
+            width: 100px;
+            clear: left;
+        }
+
+        .ora-kartya dd {
+            margin-left: 110px;
+            padding-bottom: 5px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>🗓️ Órarend Betöltése és Lista Nézet</h1>
+    
+    <div id="vezelopult">
+        <label for="jsonFile">Válassza ki a Neptunkod.json fájlt:</label>
+        <input type="file" id="jsonFile" accept=".json">
+        <button onclick="betoltEsMent()">⬇️ Betöltés és Mentés Local Storage-ba</button>
+        <button onclick="megjelenitOrarendList()">🔄 Frissítés Local Storage-ból</button>
+    </div>
+
+    <hr>
+
+    <h2>Órarend Részletek (Lista)</h2>
+    <div id="orarendMegjelenites">
+        </div>
+
+    <script>
+        const STORAGE_KEY = 'orarendDB';
+        const orarendMegjelenites = document.getElementById('orarendMegjelenites');
+
+        /**
+         * Fájl beolvasása, Local Storage-ba mentése, majd a lista frissítése.
+         */
+        function betoltEsMent() {
+            const fileInput = document.getElementById('jsonFile');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Kérem, válasszon ki egy JSON fájlt a betöltéshez!');
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                try {
+                    const jsonText = e.target.result;
+                    const orarend = JSON.parse(jsonText);
+
+                    if (!Array.isArray(orarend)) {
+                        throw new Error("A JSON fájl nem érvényes tömböt tartalmaz.");
+                    }
+                    
+                    // Mentés a Local Storage-ba
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(orarend));
+                    alert('Orarend adatok sikeresen betöltve és elmentve a Local Storage-ba!');
+                    
+                    megjelenitOrarendList(); // Lista frissítése
+                } catch (error) {
+                    alert('Hiba a fájl feldolgozásakor: ' + error.message);
+                    console.error('Feldolgozási hiba:', error);
+                }
+            };
+
+            reader.readAsText(file); // Fájl beolvasása szövegként
+        }
+        
+        /**
+         * Betölti az órarend adatokat a Local Storage-ból.
+         * @returns {Array} Az órarendi objektumok tömbje.
+         */
+        function betoltOrarend() {
+            const jsonString = localStorage.getItem(STORAGE_KEY);
+            return jsonString ? JSON.parse(jsonString) : [];
+        }
+
+        /**
+         * Megjeleníti az órarendet lista formában.
+         */
+        function megjelenitOrarendList() {
+            const orarend = betoltOrarend();
+            orarendMegjelenites.innerHTML = ''; // Tartalom törlése
+
+            if (orarend.length === 0) {
+                orarendMegjelenites.innerHTML = '<p>Nincs órarend adat a Local Storage-ban. Kérem, töltsön be egy JSON fájlt!</p>';
+                return;
+            }
+
+            // Napok sorrendjének meghatározása (opcionális, de hasznos)
+            const napSorrend = ["Hétfő", "Kedd", "Szerda", "Csütörtök", "Péntek", "Szombat", "Vasárnap"];
+            orarend.sort((a, b) => {
+                const indexA = napSorrend.indexOf(a.nap);
+                const indexB = napSorrend.indexOf(b.nap);
+                if (indexA !== indexB) {
+                    return indexA - indexB; // Rendezés nap szerint
+                }
+                return a.kezdet.localeCompare(b.kezdet); // Ha azonos nap, akkor idő szerint
+            });
+
+            // Megjelenítés "kártya" stílusban (részletező lista - <dl>)
+            orarend.forEach(ora => {
+                const kartya = document.createElement('div');
+                kartya.className = 'ora-kartya';
+                
+                // Cím: Nap + Idő
+                kartya.innerHTML = `
+                    <h3>${ora.nap} (${ora.kezdet} - ${ora.veg})</h3>
+                    <dl>
+                        <dt>Tárgy:</dt><dd>${ora.targy || 'Nincs adat'}</dd>
+                        <dt>Helyszín:</dt><dd>${ora.helyszin || 'Nincs adat'}</dd>
+                        <dt>Oktató:</dt><dd>${ora.oktato || 'Nincs adat'}</dd>
+                    </dl>
+                `;
+                
+                orarendMegjelenites.appendChild(kartya);
+            });
+        }
+        
+        // Oldal betöltésekor azonnal megpróbáljuk betölteni a Local Storage-ból
+        window.onload = megjelenitOrarendList;
+
+    </script>
+</body>
+</html>

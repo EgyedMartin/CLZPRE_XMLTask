@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orarend - Táblázat Nézet (Local Storage)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+
+        h1 {
+            color: #007bff;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 5px;
+        }
+
+        /* Vezérlőpult stílusa */
+        #vezelopult {
+            background-color: #fff;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        button {
+            background-color: #5cb85c;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #4cae4c;
+        }
+
+        /* Táblázat stílusa */
+        #orarendMegjelenites {
+            margin-top: 20px;
+        }
+
+        #oraTabla {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #oraTabla th, #oraTabla td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        #oraTabla th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+
+        #oraTabla tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        #oraTabla tr:hover {
+            background-color: #ddd;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>🗓️ Órarend Betöltése és Táblázat Nézet</h1>
+    
+    <div id="vezelopult">
+        <label for="jsonFile">Válassza ki a Neptunkod.json fájlt:</label>
+        <input type="file" id="jsonFile" accept=".json">
+        <button onclick="betoltEsMent()">⬇️ Betöltés és Mentés Local Storage-ba</button>
+        <button onclick="megjelenitOrarendTabl()">🔄 Frissítés Local Storage-ból</button>
+    </div>
+
+    <hr>
+
+    <h2>Órarend Részletek (Táblázat)</h2>
+    <div id="orarendMegjelenites">
+        <table id="oraTabla">
+            <thead>
+                <tr>
+                    <th>Nap</th>
+                    <th>Kezdet</th>
+                    <th>Vég</th>
+                    <th>Tárgy</th>
+                    <th>Helyszín</th>
+                    <th>Oktató</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'orarendDB';
+        const tablaBody = document.querySelector('#oraTabla tbody');
+
+        /**
+         * Fájl beolvasása, Local Storage-ba mentése, majd a táblázat frissítése.
+         */
+        function betoltEsMent() {
+            const fileInput = document.getElementById('jsonFile');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Kérem, válasszon ki egy JSON fájlt a betöltéshez!');
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                try {
+                    const jsonText = e.target.result;
+                    const orarend = JSON.parse(jsonText);
+
+                    if (!Array.isArray(orarend)) {
+                        throw new Error("A JSON fájl nem érvényes tömböt tartalmaz.");
+                    }
+                    
+                    // Mentés a Local Storage-ba
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(orarend));
+                    alert('Orarend adatok sikeresen betöltve és elmentve a Local Storage-ba!');
+                    
+                    megjelenitOrarendTabl(); // Táblázat frissítése
+                } catch (error) {
+                    alert('Hiba a fájl feldolgozásakor: ' + error.message);
+                    console.error('Feldolgozási hiba:', error);
+                }
+            };
+
+            reader.readAsText(file); // Fájl beolvasása szövegként
+        }
+        
+        /**
+         * Betölti az órarend adatokat a Local Storage-ból.
+         * @returns {Array} Az órarendi objektumok tömbje.
+         */
+        function betoltOrarend() {
+            const jsonString = localStorage.getItem(STORAGE_KEY);
+            return jsonString ? JSON.parse(jsonString) : [];
+        }
+
+        /**
+         * Megjeleníti az órarendet táblázat formában.
+         */
+        function megjelenitOrarendTabl() {
+            const orarend = betoltOrarend();
+            tablaBody.innerHTML = ''; // Táblázat tartalmának törlése
+
+            if (orarend.length === 0) {
+                const row = tablaBody.insertRow();
+                const cell = row.insertCell(0);
+                cell.colSpan = 6;
+                cell.textContent = "Nincs órarend adat a Local Storage-ban. Kérem, töltsön be egy JSON fájlt!";
+                cell.style.textAlign = 'center';
+                return;
+            }
+            
+            // Napok sorrendjének meghatározása (opcionális, de hasznos)
+            const napSorrend = ["Hétfő", "Kedd", "Szerda", "Csütörtök", "Péntek", "Szombat", "Vasárnap"];
+            orarend.sort((a, b) => {
+                const indexA = napSorrend.indexOf(a.nap);
+                const indexB = napSorrend.indexOf(b.nap);
+                if (indexA !== indexB) {
+                    return indexA - indexB; // Rendezés nap szerint
+                }
+                return a.kezdet.localeCompare(b.kezdet); // Ha azonos nap, akkor idő szerint
+            });
+
+
+            // Sorok létrehozása
+            orarend.forEach(ora => {
+                const row = tablaBody.insertRow();
+                
+                row.insertCell(0).textContent = ora.nap || 'N/A';
+                row.insertCell(1).textContent = ora.kezdet || 'N/A';
+                row.insertCell(2).textContent = ora.veg || 'N/A';
+                row.insertCell(3).textContent = ora.targy || 'N/A';
+                row.insertCell(4).textContent = ora.helyszin || 'N/A';
+                row.insertCell(5).textContent = ora.oktato || 'N/A';
+            });
+        }
+        
+        // Oldal betöltésekor azonnal megpróbáljuk betölteni a Local Storage-ból
+        window.onload = megjelenitOrarendTabl;
+
+    </script>
+</body>
+</html>

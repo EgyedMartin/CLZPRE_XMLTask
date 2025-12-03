@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autó-Tulajdonos Adatbázis (IndexedDB CRUD + 1:N)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+
+        h1, h2 {
+            color: #333;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 5px;
+        }
+
+        section {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .form-group label {
+            width: 120px;
+            font-weight: bold;
+        }
+
+        .form-group input[type="text"],
+        .form-group select {
+            flex-grow: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        .delete-btn {
+            background-color: #dc3545;
+        }
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+        .edit-btn {
+            background-color: #ffc107;
+            color: #333;
+        }
+        .edit-btn:hover {
+            background-color: #e0a800;
+        }
+
+        /* Táblázat stílusok */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        .muvelet-cella {
+            width: 150px;
+        }
+        
+        /* JSON Műveletek */
+        #json-adat {
+            width: 100%;
+            height: 150px;
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🚗 IndexedDB Adatbázis Kezelés (CLZPRE)</h1>
+
+    <section id="tulajdonos-crud">
+        <h2>🧑‍💼 Tulajdonos Kezelés</h2>
+        <form id="tulajdonos-form">
+            <input type="hidden" id="tulaj-tkod-modositando" value="">
+            <div class="form-group">
+                <label for="tulaj-nev">Név:</label>
+                <input type="text" id="tulaj-nev" required>
+            </div>
+            <div class="form-group">
+                <label for="tulaj-email">Email:</label>
+                <input type="text" id="tulaj-email" required>
+            </div>
+            <button type="submit" id="tulaj-mentes-btn">💾 Új Tulajdonos Mentése</button>
+            <button type="button" onclick="tulajFormReset()">🗑️ Űrlap Törlése</button>
+        </form>
+
+        <hr>
+
+        <h3>Keresés Tulajdonosok között</h3>
+        <div class="form-group">
+            <label for="tulaj-kereses-nev">Keresés (Név):</label>
+            <input type="text" id="tulaj-kereses-nev" onkeyup="tulajdonosokListazasa()">
+        </div>
+
+        <h3>Összes Tulajdonos</h3>
+        <table id="tulajdonos-tabla">
+            <thead>
+                <tr>
+                    <th>T.Kód</th>
+                    <th onclick="tulajdonosokListazasa('nev')">Név ↕️</th>
+                    <th>Email</th>
+                    <th class="muvelet-cella">Műveletek</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </section>
+
+    <hr>
+    
+    <section id="auto-crud">
+        <h2>🛠️ Autó Kezelés</h2>
+        <form id="auto-form">
+            <input type="hidden" id="auto-eredeti-rendszam" value="">
+            
+            <div class="form-group">
+                <label for="auto-rendszam">Rendszám (Fő kulcs):</label>
+                <input type="text" id="auto-rendszam" required minlength="6" maxlength="7" pattern="[A-Z0-9]+" title="6-7 karakter, csak betű/szám">
+            </div>
+            <div class="form-group">
+                <label for="auto-tulajTkod">Tulajdonos (1:N):</label>
+                <select id="auto-tulajTkod" required>
+                    <option value="">-- Válasszon Tulajdonost --</option>
+                    </select>
+            </div>
+            <div class="form-group">
+                <label for="auto-tipus">Típus:</label>
+                <input type="text" id="auto-tipus" required>
+            </div>
+            <div class="form-group">
+                <label for="auto-szin">Szín:</label>
+                <input type="text" id="auto-szin" required>
+            </div>
+            <div class="form-group">
+                <label for="auto-evjarat">Évjárat:</label>
+                <input type="number" id="auto-evjarat" min="1900" max="2100" required>
+            </div>
+            
+            <button type="submit" id="auto-mentes-btn">💾 Új Autó Mentése</button>
+            <button type="button" onclick="autoFormReset()">🗑️ Űrlap Törlése</button>
+        </form>
+
+        <hr>
+
+        <h3>Keresés / Szűrés</h3>
+        <div class="form-group">
+            <label for="auto-kereses">Keresés (Rendszám, Típus, Szín):</label>
+            <input type="text" id="auto-kereses" onkeyup="autokListazasa()">
+        </div>
+        <div class="form-group">
+            <label for="auto-szures-tulaj">Szűrés (Tulajdonos):</label>
+            <select id="auto-szures-tulaj" onchange="autokListazasa()">
+                <option value="">-- Összes Tulajdonos --</option>
+                </select>
+        </div>
+
+        <h3>Autók Listája</h3>
+        <table id="auto-tabla">
+            <thead>
+                <tr>
+                    <th onclick="autokListazasa('rendszam')">Rendszám ↕️</th>
+                    <th onclick="autokListazasa('tipus')">Típus ↕️</th>
+                    <th onclick="autokListazasa('szin')">Szín ↕️</th>
+                    <th>Évjárat</th>
+                    <th>Tulajdonos (T.Kód)</th>
+                    <th class="muvelet-cella">Műveletek</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </section>
+
+    <hr>
+
+    <section id="json-muveletek">
+        <h2>🔄 JSON Export / Import</h2>
+        <textarea id="json-adat" placeholder="Illessze be ide a JSON adatot az importáláshoz..."></textarea><br>
+        <button onclick="exportDB()">⬇️ Export DB (JSON)</button>
+        <button onclick="importDB()">⬆️ Import DB (JSON)</button>
+    </section>
+
+    <script>
+        // IndexedDB Konstansok
+        const DB_NAME = 'AutoTulajDB_v1';
+        const DB_VERSION = 1;
+        const STORE_TULAJDONOS = 'Tulajdonos';
+        const STORE_AUTO = 'Auto';
+        let db; // Az adatbázis objektumot tárolja
+
+        // Rendezés állapota
+        let tulajRendezesOszlop = 'tkod';
+        let autoRendezesOszlop = 'rendszam';
+        let rendezesIrany = 'asc'; // Globális rendezési irány
+
+        // 1. **IndexedDB Inicializálás és Struktúra Beállítása**
+
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+                request.onerror = (event) => {
+                    console.error("IndexedDB hiba:", event.target.errorCode);
+                    alert("Hiba az adatbázis megnyitásakor: " + event.target.errorCode);
+                    reject(event.target.errorCode);
+                };
+
+                request.onsuccess = (event) => {
+                    db = event.target.result;
+                    console.log("IndexedDB sikeresen megnyitva.");
+                    
+                    // Frissítjük a Tulajdonos dropdown listákat
+                    tulajdonosokFeltolteseDropdownnal();
+                    // Listák inicializálása
+                    tulajdonosokListazasa();
+                    autokListazasa();
+                    resolve(db);
+                };
+
+                // A struktúra beállítása/frissítése (csak verzióváltáskor fut le)
+                request.onupgradeneeded = (event) => {
+                    db = event.target.result;
+
+                    // Tulajdonos Object Store
+                    if (!db.objectStoreNames.contains(STORE_TULAJDONOS)) {
+                        const tulajdonosStore = db.createObjectStore(STORE_TULAJDONOS, { keyPath: 'tkod', autoIncrement: true });
+                        tulajdonosStore.createIndex('nev', 'nev', { unique: false });
+                        console.log(`${STORE_TULAJDONOS} object store létrehozva.`);
+                    }
+
+                    // Autó Object Store
+                    if (!db.objectStoreNames.contains(STORE_AUTO)) {
+                        const autoStore = db.createObjectStore(STORE_AUTO, { keyPath: 'rendszam' });
+                        autoStore.createIndex('tulajTkod', 'tulajTkod', { unique: false });
+                        autoStore.createIndex('tipus', 'tipus', { unique: false });
+                        autoStore.createIndex('szin', 'szin', { unique: false });
+                        console.log(`${STORE_AUTO} object store létrehozva.`);
+                        
+                        // Adatok feltöltése (min rekord)
+                        event.target.transaction.oncomplete = () => {
+                            feltoltMintaAdatok();
+                        };
+                    }
+                };
+            });
+        }
+        
+        // Minta adatok betöltése az első futtatáskor
+        function feltoltMintaAdatok() {
+            const tx = db.transaction([STORE_TULAJDONOS, STORE_AUTO], 'readwrite');
+            const tulajdonosStore = tx.objectStore(STORE_TULAJDONOS);
+            const autoStore = tx.objectStore(STORE_AUTO);
+            
+            // 1. Tulajdonosok
+            const tulaj1 = { nev: 'Kiss Béla', email: 'kiss.bela@email.hu' };
+            const tulaj2 = { nev: 'Nagy Anna', email: 'nagy.anna@email.hu' };
+            const tulaj3 = { nev: 'Varga Tamás', email: 'varga.tamas@email.hu' };
+
+            const req1 = tulajdonosStore.add(tulaj1);
+            req1.onsuccess = (e) => {
+                const tkod1 = e.target.result; // Megkapjuk az autoIncrement kulcsot
+                // 2. Autók hozzáadása a Tulajdonos 1-hez
+                autoStore.add({ rendszam: 'ABC-123', tulajTkod: tkod1, tipus: 'Suzuki Swift', szin: 'Piros', evjarat: 2005 });
+                autoStore.add({ rendszam: 'XYZ-987', tulajTkod: tkod1, tipus: 'Toyota Yaris', szin: 'Kék', evjarat: 2018 });
+            };
+
+            const req2 = tulajdonosStore.add(tulaj2);
+            req2.onsuccess = (e) => {
+                const tkod2 = e.target.result;
+                autoStore.add({ rendszam: 'DEF-456', tulajTkod: tkod2, tipus: 'Ford Focus', szin: 'Fekete', evjarat: 2010 });
+            };
+
+            tulajdonosStore.add(tulaj3); // tkod3 autoIncrement
+
+            tx.oncomplete = () => {
+                console.log("Minta adatok feltöltve.");
+                tulajdonosokFeltolteseDropdownnal();
+                tulajdonosokListazasa();
+                autokListazasa();
+            };
+            tx.onerror = (e) => console.error("Minta adatok feltöltési hiba:", e);
+        }
+
+        // 2. **Tulajdonos CRUD és Keresés**
+        
+        document.getElementById('tulajdonos-form').onsubmit = (event) => {
+            event.preventDefault();
+            const tkod = document.getElementById('tulaj-tkod-modositando').value;
+            const nev = document.getElementById('tulaj-nev').value.trim();
+            const email = document.getElementById('tulaj-email').value.trim();
+            
+            const tulaj = { nev, email };
+            if (tkod) {
+                tulaj.tkod = parseInt(tkod); // Módosításhoz be kell állítani a kulcsot
+            }
+
+            mentesTulajdonos(tulaj);
+        };
+
+        function mentesTulajdonos(tulaj) {
+            const tx = db.transaction(STORE_TULAJDONOS, 'readwrite');
+            const store = tx.objectStore(STORE_TULAJDONOS);
+            
+            const request = tulaj.tkod ? store.put(tulaj) : store.add(tulaj);
+
+            request.onsuccess = () => {
+                alert(`Tulajdonos sikeresen ${tulaj.tkod ? 'módosítva' : 'hozzáadva'}!`);
+                tulajFormReset();
+                tulajdonosokFeltolteseDropdownnal();
+                tulajdonosokListazasa();
+            };
+            request.onerror = (e) => {
+                alert("Hiba a Tulajdonos mentésekor.");
+                console.error("Mentési hiba:", e);
+            };
+        }
+        
+        function tulajdonosModositasElokeszites(tkod) {
+            const tx = db.transaction(STORE_TULAJDONOS, 'readonly');
+            const store = tx.objectStore(STORE_TULAJDONOS);
+            const request = store.get(tkod);
+
+            request.onsuccess = (event) => {
+                const tulaj = event.target.result;
+                if (tulaj) {
+                    document.getElementById('tulaj-tkod-modositando').value = tulaj.tkod;
+                    document.getElementById('tulaj-nev').value = tulaj.nev;
+                    document.getElementById('tulaj-email').value = tulaj.email;
+                    document.getElementById('tulaj-mentes-btn').textContent = '📝 Módosítás Mentése';
+                }
+            };
+        }
+        
+        function tulajdonosTorles(tkod) {
+            if (!confirm(`Biztosan törölni szeretné a(z) ${tkod} T.Kódú tulajdonost? A hozzá tartozó autók tulajdonosa "Nincs" lesz.`)) return;
+
+            // Először módosítjuk a hozzá tartozó autók tulajTkod mezőjét (gyengítjük a kapcsolatot)
+            const txAuto = db.transaction(STORE_AUTO, 'readwrite');
+            const autoStore = txAuto.objectStore(STORE_AUTO);
+            const index = autoStore.index('tulajTkod');
+            const range = IDBKeyRange.only(tkod);
+            
+            index.openCursor(range).onsuccess = (event) => {
+                const cursor = event.target.result;
+                if (cursor) {
+                    const auto = cursor.value;
+                    auto.tulajTkod = null; // Vagy egy speciális "Nincs Tulajdonos" kulcs
+                    cursor.update(auto);
+                    cursor.continue();
+                }
+            };
+
+            txAuto.oncomplete = () => {
+                // Majd töröljük a Tulajdonost
+                const txTulaj = db.transaction(STORE_TULAJDONOS, 'readwrite');
+                const tulajStore = txTulaj.objectStore(STORE_TULAJDONOS);
+                tulajStore.delete(tkod).onsuccess = () => {
+                    alert('Tulajdonos és kapcsolódó adatok frissítése sikeres.');
+                    tulajFormReset();
+                    tulajdonosokFeltolteseDropdownnal();
+                    tulajdonosokListazasa();
+                    autokListazasa(); // Autó lista frissítése is szükséges
+                };
+            };
+            txAuto.onerror = (e) => console.error("Tulajdonos törlési hiba (autó frissítéskor):", e);
+        }
+
+        function tulajFormReset() {
+            document.getElementById('tulajdonos-form').reset();
+            document.getElementById('tulaj-tkod-modositando').value = '';
+            document.getElementById('tulaj-mentes-btn').textContent = '💾 Új Tulajdonos Mentése';
+        }
+
+        function tulajdonosokListazasa(oszlop) {
+            const tablaBody = document.querySelector('#tulajdonos-tabla tbody');
+            const keresoSzo = document.getElementById('tulaj-kereses-nev').value.toLowerCase().trim();
+            tablaBody.innerHTML = '<tr><td colspan="4">Betöltés...</td></tr>';
+            
+            // Rendezés beállítása
+            if (oszlop) {
+                if (tulajRendezesOszlop === oszlop) {
+                    rendezesIrany = (rendezesIrany === 'asc' ? 'desc' : 'asc');
+                } else {
+                    tulajRendezesOszlop = oszlop;
+                    rendezesIrany = 'asc';
+                }
+            }
+
+            const tx = db.transaction(STORE_TULAJDONOS, 'readonly');
+            const store = tx.objectStore(STORE_TULAJDONOS);
+            
+            // Keresés név index alapján (ha a keresőszo nem üres)
+            let index;
+            let range;
+            if (keresoSzo) {
+                // Mivel az IndexedDB csak "start with" (prefix) keresést támogat indexen keresztül hatékonyan,
+                // használhatunk `lowerBound` és `upperBound`-ot. De mivel a feladat csak "név alapján" keresést kér,
+                // a legegyszerűbb, ha csak a listázás után szűrünk, ha nem tiszta prefix keresésről van szó.
+                // Itt csak sima beolvasást használok, majd JS-ben szűrök.
+                index = store.index('nev');
+                // Ha csak a prefixet akarnánk, ez lenne: 
+                // range = IDBKeyRange.bound(keresoSzo, keresoSzo + '\uffff', false, false);
+            }
+
+            const request = index ? index.openCursor(range) : store.openCursor();
+            const tulajdonosok = [];
+
+            request.onsuccess = (event) => {
+                const cursor = event.target.result;
+                if (cursor) {
+                    const tulaj = cursor.value;
+                    // JS oldali keresés, ha nem indexelt a mezőre van szükség
+                    if (!keresoSzo || tulaj.nev.toLowerCase().includes(keresoSzo)) {
+                        tulajdonosok.push(tulaj);
+                    }
+                    cursor.continue();
+                } else {
+                    // Rendezés és megjelenítés
+                    tulajdonosok.sort((a, b) => {
+                        const aVal = String(a[tulajRendezesOszlop]).toLowerCase();
+                        const bVal = String(b[tulajRendezesOszlop]).toLowerCase();
+                        let osszehasonlitas = aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+                        return rendezesIrany === 'asc' ? osszehasonlitas : -osszehasonlitas;
+                    });
+                    
+                    tablaBody.innerHTML = ''; // Táblázat törlése
+
+                    if (tulajdonosok.length === 0) {
+                        tablaBody.innerHTML = '<tr><td colspan="4">Nincs megjeleníthető tulajdonos.</td></tr>';
+                        return;
+                    }
+                    
+                    tulajdonosok.forEach(tulaj => {
+                        const row = tablaBody.insertRow();
+                        row.insertCell(0).textContent = tulaj.tkod;
+                        row.insertCell(1).textContent = tulaj.nev;
+                        row.insertCell(2).textContent = tulaj.email;
+                        
+                        const muveletCell = row.insertCell(3);
+                        muveletCell.className = 'muvelet-cella';
+                        
+                        const modositBtn = document.createElement('button');
+                        modositBtn.textContent = '✏️';
+                        modositBtn.className = 'edit-btn';
+                        modositBtn.onclick = () => tulajdonosModositasElokeszites(tulaj.tkod);
+                        
+                        const torolBtn = document.createElement('button');
+                        torolBtn.textContent = '❌';
+                        torolBtn.className = 'delete-btn';
+                        torolBtn.onclick = () => tulajdonosTorles(tulaj.tkod);
+                        
+                        muveletCell.appendChild(modositBtn);
+                        muveletCell.appendChild(torolBtn);
+                    });
+                }
+            };
+        }
+        
+        // 3. **Autó CRUD, Keresés és Szűrés**
+
+        function tulajdonosokFeltolteseDropdownnal() {
+            const tulajSelectAuto = document.getElementById('auto-tulajTkod');
+            const tulajSelectSzures = document.getElementById('auto-szures-tulaj');
+            
+            // Megtartjuk az első (default) opciókat
+            tulajSelectAuto.innerHTML = '<option value="">-- Válasszon Tulajdonost --</option>';
+            tulajSelectSzures.innerHTML = '<option value="">-- Összes Tulajdonos --</option>';
+
+            const tx = db.transaction(STORE_TULAJDONOS, 'readonly');
+            const store = tx.objectStore(STORE_TULAJDONOS);
+            const request = store.openCursor();
+            
+            request.onsuccess = (event) => {
+                const cursor = event.target.result;
+                if (cursor) {
+                    const tulaj = cursor.value;
+                    
+                    const optionAuto = new Option(`${tulaj.nev} (T.Kód: ${tulaj.tkod})`, tulaj.tkod);
+                    tulajSelectAuto.add(optionAuto);
+                    
+                    const optionSzures = new Option(`${tulaj.nev} (T.Kód: ${tulaj.tkod})`, tulaj.tkod);
+                    tulajSelectSzures.add(optionSzures);
+                    
+                    cursor.continue();
+                }
+            };
+        }
+        
+        document.getElementById('auto-form').onsubmit = (event) => {
+            event.preventDefault();
+            const rendszam = document.getElementById('auto-rendszam').value.toUpperCase().trim();
+            const eredetiRendszam = document.getElementById('auto-eredeti-rendszam').value;
+            const tulajTkod = parseInt(document.getElementById('auto-tulajTkod').value);
+            const tipus = document.getElementById('auto-tipus').value.trim();
+            const szin = document.getElementById('auto-szin').value.trim();
+            const evjarat = parseInt(document.getElementById('auto-evjarat').value);
+            
+            const auto = { rendszam, tulajTkod, tipus, szin, evjarat };
+
+            if (eredetiRendszam && eredetiRendszam !== rendszam) {
+                 // Ha módosítás van, és megváltozott a kulcs (rendszám)
+                 alert("A rendszám módosítása kulcsmező cserét igényel. Kérjük, használja a Törlés, majd Új autó funkciót a kulcs cseréjéhez.");
+                 return;
+            }
+
+            mentesAuto(auto, eredetiRendszam);
+        };
+        
+        function mentesAuto(auto, eredetiRendszam) {
+            const tx = db.transaction(STORE_AUTO, 'readwrite');
+            const store = tx.objectStore(STORE_AUTO);
+            
+            const request = eredetiRendszam ? store.put(auto) : store.add(auto); // put = update, add = insert
+            
+            request.onsuccess = () => {
+                alert(`Autó sikeresen ${eredetiRendszam ? 'módosítva' : 'hozzáadva'}!`);
+                autoFormReset();
+                autokListazasa();
+            };
+            request.onerror = (e) => {
+                if (e.target.error.name === 'ConstraintError') {
+                    alert(`Hiba: A ${auto.rendszam} rendszám már létezik.`);
+                } else {
+                    alert("Hiba az Autó mentésekor.");
+                    console.error("Mentési hiba:", e);
+                }
+            };
+        }
+        
+        function autoModositasElokeszites(rendszam) {
+            const tx = db.transaction(STORE_AUTO, 'readonly');
+            const store = tx.objectStore(STORE_AUTO);
+            const request = store.get(rendszam);
+            
+            request.onsuccess = (event) => {
+                const auto = event.target.result;
+                if (auto) {
+                    document.getElementById('auto-rendszam').value = auto.rendszam;
+                    document.getElementById('auto-eredeti-rendszam').value = auto.rendszam; // Ezt használjuk ellenőrzésre
+                    document.getElementById('auto-rendszam').readOnly = true; // Rendszámot nem engedjük módosítani
+                    document.getElementById('auto-tulajTkod').value = auto.tulajTkod || ''; 
+                    document.getElementById('auto-tipus').value = auto.tipus;
+                    document.getElementById('auto-szin').value = auto.szin;
+                    document.getElementById('auto-evjarat').value = auto.evjarat;
+                    document.getElementById('auto-mentes-btn').textContent = '📝 Módosítás Mentése';
+                }
+            };
+        }
+        
+        function autoTorles(rendszam) {
+            if (!confirm(`Biztosan törölni szeretné a(z) ${rendszam} rendszámú autót?`)) return;
+
+            const tx = db.transaction(STORE_AUTO, 'readwrite');
+            const store = tx.objectStore(STORE_AUTO);
+            
+            store.delete(rendszam).onsuccess = () => {
+                alert('Autó sikeresen törölve.');
+                autokListazasa();
+            };
+        }
+        
+        function autoFormReset() {
+            document.getElementById('auto-form').reset();
+            document.getElementById('auto-eredeti-rendszam').value = '';
+            document.getElementById('auto-rendszam').readOnly = false;
+            document.getElementById('auto-mentes-btn').textContent = '💾 Új Autó Mentése';
+        }
+
+        async function autokListazasa(oszlop) {
+            const tablaBody = document.querySelector('#auto-tabla tbody');
+            const keresoSzo = document.getElementById('auto-kereses').value.toLowerCase().trim();
+            const szuresTulajTkod = document.getElementById('auto-szures-tulaj').value;
+            tablaBody.innerHTML = '<tr><td colspan="6">Betöltés...</td></tr>';
+
+            // Rendezés beállítása
+            if (oszlop) {
+                if (autoRendezesOszlop === oszlop) {
+                    rendezesIrany = (rendezesIrany === 'asc' ? 'desc' : 'asc');
+                } else {
+                    autoRendezesOszlop = oszlop;
+                    rendezesIrany = 'asc';
+                }
+            }
+
+            // Tulajdonos nevek előzetes betöltése
+            const tulajdonosokMap = await getAllOwnersMap();
+
+            const tx = db.transaction(STORE_AUTO, 'readonly');
+            const store = tx.objectStore(STORE_AUTO);
+            const autok = [];
+
+            let index;
+            let range;
+            
+            // Szűrés Tulajdonos alapján (Index használatával)
+            if (szuresTulajTkod) {
+                index = store.index('tulajTkod');
+                range = IDBKeyRange.only(parseInt(szuresTulajTkod));
+            } else if (keresoSzo) {
+                 // Keresés Rendszám, Típus vagy Szín alapján (Nincs hatékony egy Index)
+                 // Kézzel kell iterálni az összes adatot, ha a keresés több mezőre is vonatkozik
+                 // Ehelyett csak sima openCursor()-t használunk és JS-ben szűrünk
+            }
+            
+            const request = index ? index.openCursor(range) : store.openCursor();
+
+            request.onsuccess = (event) => {
+                const cursor = event.target.result;
+                if (cursor) {
+                    const auto = cursor.value;
+                    
+                    // JS oldali keresés (rendszám, típus, szín)
+                    const keresesTalalat = !keresoSzo || 
+                        auto.rendszam.toLowerCase().includes(keresoSzo) ||
+                        auto.tipus.toLowerCase().includes(keresoSzo) ||
+                        auto.szin.toLowerCase().includes(keresoSzo);
+                    
+                    if (keresesTalalat) {
+                        autok.push(auto);
+                    }
+                    cursor.continue();
+                } else {
+                    // Rendezés és megjelenítés
+                    autok.sort((a, b) => {
+                        const aVal = String(a[autoRendezesOszlop]).toLowerCase();
+                        const bVal = String(b[autoRendezesOszlop]).toLowerCase();
+                        let osszehasonlitas = aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+                        return rendezesIrany === 'asc' ? osszehasonlitas : -osszehasonlitas;
+                    });
+                    
+                    tablaBody.innerHTML = ''; // Táblázat törlése
+
+                    if (autok.length === 0) {
+                        tablaBody.innerHTML = '<tr><td colspan="6">Nincs megjeleníthető autó.</td></tr>';
+                        return;
+                    }
+
+                    autok.forEach(auto => {
+                        const row = tablaBody.insertRow();
+                        const tulajNev = tulajdonosokMap[auto.tulajTkod] ? 
+                                         `${tulajdonosokMap[auto.tulajTkod].nev} (${auto.tulajTkod})` : 
+                                         `Nincs (Kód: ${auto.tulajTkod || 'N/A'})`;
+                        
+                        row.insertCell(0).textContent = auto.rendszam;
+                        row.insertCell(1).textContent = auto.tipus;
+                        row.insertCell(2).textContent = auto.szin;
+                        row.insertCell(3).textContent = auto.evjarat;
+                        row.insertCell(4).textContent = tulajNev;
+                        
+                        const muveletCell = row.insertCell(5);
+                        muveletCell.className = 'muvelet-cella';
+
+                        const modositBtn = document.createElement('button');
+                        modositBtn.textContent = '✏️';
+                        modositBtn.className = 'edit-btn';
+                        modositBtn.onclick = () => autoModositasElokeszites(auto.rendszam);
+                        
+                        const torolBtn = document.createElement('button');
+                        torolBtn.textContent = '❌';
+                        torolBtn.className = 'delete-btn';
+                        torolBtn.onclick = () => autoTorles(auto.rendszam);
+                        
+                        muveletCell.appendChild(modositBtn);
+                        muveletCell.appendChild(torolBtn);
+                    });
+                }
+            };
+        }
+
+        // Segédfüggvény: Tulajdonosok betöltése a gyors 1:N feloldáshoz
+        function getAllOwnersMap() {
+            return new Promise((resolve) => {
+                const tx = db.transaction(STORE_TULAJDONOS, 'readonly');
+                const store = tx.objectStore(STORE_TULAJDONOS);
+                const request = store.getAll();
+                const map = {};
+
+                request.onsuccess = (event) => {
+                    event.target.result.forEach(tulaj => {
+                        map[tulaj.tkod] = tulaj;
+                    });
+                    resolve(map);
+                };
+                request.onerror = () => resolve({});
+            });
+        }
+        
+        // 4. **JSON Export / Import**
+        
+        async function exportDB() {
+            const tulajdonosok = await getStoreData(STORE_TULAJDONOS);
+            const autok = await getStoreData(STORE_AUTO);
+
+            const exportData = {
+                tulajdonosok: tulajdonosok,
+                autok: autok
+            };
+
+            const jsonText = JSON.stringify(exportData, null, 2);
+            document.getElementById('json-adat').value = jsonText;
+
+            // Fájlként letöltés
+            const blob = new Blob([jsonText], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'IndexedDB_export.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            alert('Adatbázis exportálva JSON formátumban és letöltés elindítva!');
+        }
+
+        function getStoreData(storeName) {
+            return new Promise((resolve) => {
+                const tx = db.transaction(storeName, 'readonly');
+                const store = tx.objectStore(storeName);
+                const request = store.getAll();
+                
+                request.onsuccess = (event) => resolve(event.target.result);
+                request.onerror = () => resolve([]);
+            });
+        }
+        
+        function importDB() {
+            const jsonText = document.getElementById('json-adat').value.trim();
+            if (!jsonText) {
+                alert('Illesszen be JSON adatot az importáláshoz!');
+                return;
+            }
+
+            try {
+                const importData = JSON.parse(jsonText);
+                if (!importData.tulajdonosok || !Array.isArray(importData.tulajdonosok) || 
+                    !importData.autok || !Array.isArray(importData.autok)) {
+                    throw new Error("Hibás JSON struktúra. 'tulajdonosok' és 'autok' tömbökre van szükség.");
+                }
+
+                if (!confirm("Biztosan importálni szeretné az adatokat? Ez felülírja a meglévő IndexedDB adatokat!")) return;
+
+                // Töröljük a meglévő adatokat, majd importáljuk az újakat
+                const tx = db.transaction([STORE_TULAJDONOS, STORE_AUTO], 'readwrite');
+                const tulajStore = tx.objectStore(STORE_TULAJDONOS);
+                const autoStore = tx.objectStore(STORE_AUTO);
+
+                tulajStore.clear();
+                autoStore.clear();
+
+                // Tulajdonosok importálása
+                importData.tulajdonosok.forEach(tulaj => {
+                    // Mivel a tkod autoIncrement, muszáj a kulcsot megadni a put-tal, 
+                    // de vigyázni kell a duplikációkkal, ha nem egyedi kulcsot használunk.
+                    // Itt feltételezzük, hogy az exportált tkod-ok egyediek.
+                    tulajStore.put(tulaj); 
+                });
+
+                // Autók importálása
+                importData.autok.forEach(auto => {
+                    autoStore.put(auto); // Rendszám Fő kulcs
+                });
+
+                tx.oncomplete = () => {
+                    alert('Adatok sikeresen importálva! Az adatbázis frissült.');
+                    tulajdonosokFeltolteseDropdownnal();
+                    tulajdonosokListazasa();
+                    autokListazasa();
+                    document.getElementById('json-adat').value = '';
+                };
+                tx.onerror = (e) => {
+                    alert("Importálási hiba történt.");
+                    console.error("Import hiba:", e);
+                };
+
+            } catch (e) {
+                alert('Hibás JSON formátum vagy struktúra: ' + e.message);
+                console.error("JSON Hiba:", e);
+            }
+        }
+
+        // Indítás
+        window.onload = initDB;
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+[
+  {
+    "nap": "Hétfő",
+    "kezdet": "08:00",
+    "veg": "09:30",
+    "targy": "Programozás",
+    "helyszin": "A/201",
+    "oktato": "Dr. Nagy Elek"
+  },
+  {
+    "nap": "Kedd",
+    "kezdet": "10:00",
+    "veg": "11:30",
+    "targy": "Adatbázisok",
+    "helyszin": "Online",
+    "oktato": "Kiss Eszter"
+  }
+]

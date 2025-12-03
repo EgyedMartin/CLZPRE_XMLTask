@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hallgatói Adatbázis - Local Storage CRUD</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+
+        h1, h2 {
+            color: #333;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 5px;
+        }
+
+        /* --------------------------------- */
+        /* Form és Kereső stílusok */
+        /* --------------------------------- */
+
+        #hallgatoForm, #keresesSzures, #jsonMuveletek {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group select {
+            width: calc(100% - 12px);
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #5cb85c;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #4cae4c;
+        }
+
+        /* --------------------------------- */
+        /* Táblázat stílusok */
+        /* --------------------------------- */
+
+        #hallgatoLista {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #hallgatoLista th, #hallgatoLista td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        #hallgatoLista th {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer; /* A rendezés miatt */
+        }
+
+        #hallgatoLista tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .muvelet-gomb {
+            padding: 5px 10px;
+            font-size: 0.9em;
+        }
+
+        .modosit-btn {
+            background-color: #f0ad4e;
+        }
+
+        .modosit-btn:hover {
+            background-color: #ec971f;
+        }
+
+        .torol-btn {
+            background-color: #d9534f;
+        }
+
+        .torol-btn:hover {
+            background-color: #c9302c;
+        }
+        
+        /* --------------------------------- */
+        /* JSON Műveletek stílusai */
+        /* --------------------------------- */
+
+        #jsonMuveletek textarea {
+            width: calc(100% - 12px);
+            height: 100px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+            margin-bottom: 10px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>📚 Hallgatói Adatbázis (Local Storage)</h1>
+    
+    <section id="hallgatoForm">
+        <h2>Új Hallgató Rögzítése / Módosítása</h2>
+        <form onsubmit="mentesHallgato(event)">
+            <input type="hidden" id="neptunkodOriginal" value=""> <div class="form-group">
+                <label for="nev">Név:</label>
+                <input type="text" id="nev" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="evfolyam">Évfolyam:</label>
+                <input type="text" id="evfolyam" required pattern="[1-9]|1[0-2]|M[1-4]|PhD[1-9]" title="Csak szám (1-12) vagy 'M' és szám (M1-M4), vagy 'PhD' és szám (PhD1-PhD9)">
+            </div>
+            
+            <div class="form-group">
+                <label for="szak">Szak:</label>
+                <input type="text" id="szak" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">E-mail:</label>
+                <input type="email" id="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="neptunkod">NEPTUN Kód (6 karakter):</label>
+                <input type="text" id="neptunkod" required minlength="6" maxlength="6" pattern="[A-Z0-9]{6}" title="6 betű/szám (nagybetű)">
+            </div>
+            
+            <button type="submit" id="mentesGomb">💾 Mentés</button>
+            <button type="button" onclick="urlapTorles()">🗑️ Űrlap törlése</button>
+        </form>
+    </section>
+
+    <hr>
+    
+    <section id="keresesSzures">
+        <h2>🔎 Keresés / Szűrés</h2>
+        <div class="form-group">
+            <label for="keresesMezo">Keresés (Név, Évfolyam, Szak, Email, NEPTUN):</label>
+            <input type="text" id="keresesMezo" onkeyup="megjelenitHallgatok()" placeholder="Kezdjen gépelni...">
+        </div>
+    </section>
+
+    <hr>
+    
+    <section id="jsonMuveletek">
+        <h2>🔄 JSON Export / Import</h2>
+        <textarea id="jsonAdat" placeholder="Illessze be ide a JSON adatot az importáláshoz..."></textarea><br>
+        <button onclick="exportJSON()">⬇️ Export JSON</button>
+        <button onclick="importJSON()">⬆️ Import JSON</button>
+    </section>
+    
+    <hr>
+
+    <section>
+        <h2>🧑‍🎓 Hallgatók Listája</h2>
+        <table id="hallgatoLista">
+            <thead>
+                <tr>
+                    <th onclick="rendezes('nev')">Név ↕️</th>
+                    <th onclick="rendezes('evfolyam')">Évfolyam ↕️</th>
+                    <th onclick="rendezes('szak')">Szak</th>
+                    <th onclick="rendezes('email')">Email</th>
+                    <th onclick="rendezes('neptunkod')">NEPTUN Kód</th>
+                    <th>Művelet</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+    </section>
+
+    <script>
+        const STORAGE_KEY = 'hallgatokDB';
+        let aktualisRendezesOszlop = 'nev';
+        let rendezesIrany = 'asc'; // 'asc' vagy 'desc'
+
+        // 1. **Alapvető CRUD Műveletek - Adattárolás**
+
+        /**
+         * Betölti a hallgatói adatokat a Local Storage-ból.
+         * @returns {Array} A hallgatói objektumok tömbje, vagy üres tömb, ha nincs adat.
+         */
+        function betoltHallgatok() {
+            const jsonString = localStorage.getItem(STORAGE_KEY);
+            try {
+                return jsonString ? JSON.parse(jsonString) : [];
+            } catch (e) {
+                console.error("Hiba a JSON adatok feldolgozásakor a Local Storage-ból:", e);
+                return [];
+            }
+        }
+
+        /**
+         * Elmenti a hallgatói adatokat a Local Storage-ba.
+         * @param {Array} hallgatok - A mentendő hallgatói objektumok tömbje.
+         */
+        function mentHallgatok(hallgatok) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(hallgatok));
+        }
+        
+        // 2. **a.) Form Kezelése - Létrehozás (Create) & Módosítás (Update)**
+
+        /**
+         * Elment egy új hallgatót vagy módosít egy meglévőt.
+         * @param {Event} event - A form elküldési eseménye.
+         */
+        function mentesHallgato(event) {
+            event.preventDefault();
+            
+            const nev = document.getElementById('nev').value.trim();
+            const evfolyam = document.getElementById('evfolyam').value.trim();
+            const szak = document.getElementById('szak').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const neptunkod = document.getElementById('neptunkod').value.toUpperCase().trim();
+            const neptunkodOriginal = document.getElementById('neptunkodOriginal').value; // Módosításnál az eredeti NEPTUN
+
+            const ujHallgato = { nev, evfolyam, szak, email, neptunkod };
+            let hallgatok = betoltHallgatok();
+            let talalatIndex = -1;
+
+            if (neptunkodOriginal) {
+                // MÓDOSÍTÁS MŰVELET
+                talalatIndex = hallgatok.findIndex(h => h.neptunkod === neptunkodOriginal);
+                
+                // Ellenőrizzük, hogy az új NEPTUN kód nem létezik-e már (kivéve ha saját maga)
+                const duplikacio = hallgatok.find((h, index) => h.neptunkod === neptunkod && index !== talalatIndex);
+                if (duplikacio) {
+                    alert(`A(z) ${neptunkod} NEPTUN kód már létezik egy másik hallgatónál!`);
+                    return;
+                }
+
+                if (talalatIndex !== -1) {
+                    hallgatok[talalatIndex] = ujHallgato; // Frissítés
+                    alert('Hallgató sikeresen módosítva!');
+                } else {
+                    alert('Hiba: Az eredeti hallgató nem található.');
+                    return;
+                }
+            } else {
+                // LÉTREHOZÁS MŰVELET
+                talalatIndex = hallgatok.findIndex(h => h.neptunkod === neptunkod);
+                if (talalatIndex !== -1) {
+                    alert(`A(z) ${neptunkod} NEPTUN kód már létezik!`);
+                    return;
+                }
+                hallgatok.push(ujHallgato);
+                alert('Új hallgató sikeresen hozzáadva!');
+            }
+            
+            mentHallgatok(hallgatok);
+            urlapTorles(); // Űrlap alaphelyzetbe állítása
+            megjelenitHallgatok(); // Lista frissítése
+        }
+
+        /**
+         * Kitölti az űrlapot a megadott NEPTUN kódú hallgató adataival módosításhoz.
+         * @param {string} neptunkod - A módosítandó hallgató NEPTUN kódja.
+         */
+        function elokeszitModositas(neptunkod) {
+            const hallgatok = betoltHallgatok();
+            const hallgato = hallgatok.find(h => h.neptunkod === neptunkod);
+            
+            if (hallgato) {
+                document.getElementById('nev').value = hallgato.nev;
+                document.getElementById('evfolyam').value = hallgato.evfolyam;
+                document.getElementById('szak').value = hallgato.szak;
+                document.getElementById('email').value = hallgato.email;
+                document.getElementById('neptunkod').value = hallgato.neptunkod;
+                
+                // Módosításhoz elmentjük az eredeti kulcsot
+                document.getElementById('neptunkodOriginal').value = hallgato.neptunkod; 
+                
+                document.getElementById('neptunkod').readOnly = false; // Lehet, hogy módosítani akarja a kulcsot is
+                document.getElementById('mentesGomb').textContent = '📝 Módosítás Mentése';
+                window.scrollTo(0, 0); // Görgetés az űrlaphoz
+            }
+        }
+        
+        /**
+         * Törli az űrlap tartalmát és visszaállítja a mentés gombot.
+         */
+        function urlapTorles() {
+            document.getElementById('hallgatoForm').querySelector('form').reset();
+            document.getElementById('neptunkodOriginal').value = '';
+            document.getElementById('neptunkod').readOnly = false;
+            document.getElementById('mentesGomb').textContent = '💾 Mentés';
+        }
+
+        // 3. **e.) Hallgatók Listája - Olvasás (Read) & Törlés (Delete)**
+
+        /**
+         * Törli a megadott NEPTUN kódú hallgatót.
+         * @param {string} neptunkod - A törlendő hallgató NEPTUN kódja.
+         */
+        function torolHallgato(neptunkod) {
+            if (confirm(`Biztosan törölni szeretné a(z) ${neptunkod} NEPTUN kódú hallgatót?`)) {
+                let hallgatok = betoltHallgatok();
+                const szurtHallgatok = hallgatok.filter(h => h.neptunkod !== neptunkod);
+                
+                mentHallgatok(szurtHallgatok);
+                megjelenitHallgatok(); // Lista frissítése
+                alert('Hallgató sikeresen törölve!');
+            }
+        }
+
+        /**
+         * Megjeleníti a hallgatói adatokat a táblázatban, figyelembe véve a keresést és a rendezést.
+         */
+        function megjelenitHallgatok() {
+            let hallgatok = betoltHallgatok();
+            const tablaBody = document.querySelector('#hallgatoLista tbody');
+            const keresoSzo = document.getElementById('keresesMezo').value.toLowerCase().trim();
+            
+            // **b.) Keresés/Szűrés**
+            const szurtHallgatok = hallgatok.filter(h => 
+                h.nev.toLowerCase().includes(keresoSzo) ||
+                h.evfolyam.toLowerCase().includes(keresoSzo) ||
+                h.szak.toLowerCase().includes(keresoSzo) ||
+                h.email.toLowerCase().includes(keresoSzo) ||
+                h.neptunkod.toLowerCase().includes(keresoSzo)
+            );
+
+            // **c.) Rendezés alkalmazása**
+            szurtHallgatok.sort((a, b) => {
+                const aErtek = String(a[aktualisRendezesOszlop]).toLowerCase();
+                const bErtek = String(b[aktualisRendezesOszlop]).toLowerCase();
+                
+                let osszehasonlitas = 0;
+                if (aErtek > bErtek) {
+                    osszehasonlitas = 1;
+                } else if (aErtek < bErtek) {
+                    osszehasonlitas = -1;
+                }
+                
+                return rendezesIrany === 'asc' ? osszehasonlitas : -osszehasonlitas;
+            });
+
+            tablaBody.innerHTML = ''; // Táblázat tartalmának törlése
+            
+            if (szurtHallgatok.length === 0) {
+                const row = tablaBody.insertRow();
+                const cell = row.insertCell(0);
+                cell.colSpan = 6;
+                cell.textContent = "Nincs megjeleníthető hallgató (vagy a keresés nem talált eredményt).";
+                cell.style.textAlign = 'center';
+                return;
+            }
+
+            // Sorok létrehozása
+            szurtHallgatok.forEach(hallgato => {
+                const row = tablaBody.insertRow();
+                
+                row.insertCell(0).textContent = hallgato.nev;
+                row.insertCell(1).textContent = hallgato.evfolyam;
+                row.insertCell(2).textContent = hallgato.szak;
+                row.insertCell(3).textContent = hallgato.email;
+                row.insertCell(4).textContent = hallgato.neptunkod;
+                
+                // Művelet oszlop (Módosítás, Törlés)
+                const muveletCell = row.insertCell(5);
+                
+                const modositBtn = document.createElement('button');
+                modositBtn.textContent = '✏️ Módosítás';
+                modositBtn.className = 'muvelet-gomb modosit-btn';
+                modositBtn.onclick = () => elokeszitModositas(hallgato.neptunkod);
+                
+                const torolBtn = document.createElement('button');
+                torolBtn.textContent = '❌ Törlés';
+                torolBtn.className = 'muvelet-gomb torol-btn';
+                torolBtn.onclick = () => torolHallgato(hallgato.neptunkod);
+                
+                muveletCell.appendChild(modositBtn);
+                muveletCell.appendChild(torolBtn);
+            });
+        }
+
+        // 4. **c.) Rendezés**
+
+        /**
+         * Rendezést kezdeményez a megadott oszlop alapján.
+         * @param {string} oszlop - A rendezendő mező neve ('nev' vagy 'evfolyam' vagy 'neptunkod').
+         */
+        function rendezes(oszlop) {
+            if (aktualisRendezesOszlop === oszlop) {
+                // Ha ugyanaz az oszlop, megfordítjuk az irányt
+                rendezesIrany = (rendezesIrany === 'asc' ? 'desc' : 'asc');
+            } else {
+                // Ha új oszlop, beállítjuk az új oszlopot és alapértelmezetten 'asc'-t
+                aktualisRendezesOszlop = oszlop;
+                rendezesIrany = 'asc';
+            }
+            megjelenitHallgatok();
+        }
+
+        // 5. **d.) Export / Import JSON**
+
+        /**
+         * Exportálja a Local Storage-ban tárolt adatokat JSON formátumban.
+         */
+        function exportJSON() {
+            const hallgatok = betoltHallgatok();
+            const jsonText = JSON.stringify(hallgatok, null, 2); // 2 szóközzel formázva
+            
+            document.getElementById('jsonAdat').value = jsonText;
+            
+            // Fájlként letöltés
+            const blob = new Blob([jsonText], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'LocStoreDB_export.json'; // A kért névvel mentés
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            alert('Adatok exportálva JSON formátumban és letöltés elindítva!');
+        }
+
+        /**
+         * Importálja az adatokat a JSON mezőből a Local Storage-ba.
+         */
+        function importJSON() {
+            const jsonText = document.getElementById('jsonAdat').value.trim();
+            
+            if (!jsonText) {
+                alert('Kérem, illesszen be JSON adatot az importáláshoz!');
+                return;
+            }
+            
+            try {
+                const importaltHallgatok = JSON.parse(jsonText);
+                
+                if (!Array.isArray(importaltHallgatok)) {
+                    alert('Az importált adatnak egy JSON tömbnek kell lennie!');
+                    return;
+                }
+                
+                // Egyszerű ellenőrzés: megnézzük, hogy tartalmaznak-e a hallgató objektumok NEPTUN kódot
+                const ervenyesHallgatok = importaltHallgatok.every(h => 
+                    h.neptunkod && typeof h.neptunkod === 'string' && h.neptunkod.length === 6
+                );
+
+                if (!ervenyesHallgatok) {
+                    alert('A JSON adatok hibásak vagy hiányosak (Minden elemnek 6 karakteres "neptunkod" mezőt kell tartalmaznia)!');
+                    return;
+                }
+
+                // Eltároljuk az importált adatokat, felülírva a meglévőket
+                mentHallgatok(importaltHallgatok);
+                megjelenitHallgatok();
+                document.getElementById('jsonAdat').value = ''; // Mező ürítése
+                alert('Adatok sikeresen importálva a Local Storage-ba! (A korábbi adatok felülíródhattak.)');
+
+            } catch (e) {
+                console.error("JSON import hiba:", e);
+                alert('Hibás JSON formátum! Ellenőrizze a beillesztett adatot.');
+            }
+        }
+
+
+        // Indításkor betöltjük a táblázatot
+        window.onload = megjelenitHallgatok;
+    </script>
+
+</body>
+</html>
