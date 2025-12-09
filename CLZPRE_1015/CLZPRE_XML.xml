@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<vendeglatas xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="FJYXPC_XMLSchema.xsd">
+<vendeglatas xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="CLZPRE_XMLSchema.xsd">
     <!--Éttermek-->
     <etterem ekod="e1">
         <nev>Trófea</nev>
