@@ -37,13 +37,13 @@ public class clzpreDomRead {
     // MAPPÁK feltöltése — XML tagek magyar megfelelői
     // =====================================================================
     static {
-        // ========= Oktatók (Felhasználó) =========
+        // ========= Oktatók =========
         adatNevek.put("oktato", "Oktató");
         adatNevek.put("nev", "Név");
         adatNevek.put("szekhely", "Székhely/Iroda");
         adatNevek.put("telefonszam", "Telefonszám");
 
-        // ========= Tanszékek (Főzde) =========
+        // ========= Tanszékek =========
         adatNevek.put("tanszek", "Tanszék");
         adatNevek.put("alapitva", "Alapítva");
         adatNevek.put("cim", "Cím");
@@ -51,34 +51,34 @@ public class clzpreDomRead {
         adatNevek.put("utca", "Utca");
         adatNevek.put("hazszam", "Házszám");
 
-        // ========= Kurzusok (Sör) =========
+        // ========= Kurzusok =========
         adatNevek.put("kurzus", "Kurzus");
         adatNevek.put("kredit", "Kredit érték");
         adatNevek.put("leiras", "Leírás");
 
-        // ========= Követelmények (Címke) =========
+        // ========= Követelmények =========
         adatNevek.put("kovetelmeny", "Követelmény");
         adatNevek.put("tipus", "Típus");
         adatNevek.put("vizsga_ido", "Vizsga időpont");
         adatNevek.put("min_pont", "Minimális pontszám");
         adatNevek.put("max_pont", "Maximális pontszám");
 
-        // ========= Hallgatók (Forgalmazó) =========
+        // ========= Hallgatók =========
         adatNevek.put("hallgato", "Hallgató");
         adatNevek.put("email", "E-mail cím");
         adatNevek.put("neptun", "Neptun kód");
         adatNevek.put("profilkep", "Profilkép");
 
-        // ========= Jelentkezések (Értékelés) =========
+        // ========= Jelentkezések =========
         adatNevek.put("jelentkezes", "Jelentkezés (Oktató)");
         adatNevek.put("datum", "Dátum");
         adatNevek.put("megjegyzes", "Megjegyzés");
 
-        // ========= Vizsgák (Főzés) =========
+        // ========= Vizsgák =========
         adatNevek.put("vizsga", "Vizsga");
         adatNevek.put("vizsgazo", "Vizsgázó");
         
-        // ========= Jegyek (Vásárlás) =========
+        // ========= Jegyek =========
         adatNevek.put("jegy", "Jegy (Hallgató)");
         adatNevek.put("pontszam", "Pontszám");
         adatNevek.put("ertekeles_szoveg", "Értékelés szövege");
@@ -172,7 +172,7 @@ public class clzpreDomRead {
                         if (sub.getNodeType() == Node.ELEMENT_NODE) {
                             Element subElem = (Element) sub;
 
-                            // Ha van mélyebb struktúra (pl. <cim> alatt <varos>, <utca>…)
+                            // Ha van mélyebb struktúra
                             if (subElem.hasChildNodes() && hasElementChild(subElem)) {
 
                                 printLine(at(subElem.getNodeName()) + ":", writer);
